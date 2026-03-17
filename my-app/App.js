@@ -11,35 +11,81 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 
 
-const Tabs = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+
+function CustomDrawerContent(props) {
+  return (
+    <View style={{ flex: 1, backgroundColor:"blue" }}>
+      <View style={StyleSheet.drawerHeader}>
+        <View style={styles.avatarContainer}>
+          <Ionicons name="person-circle" size={80} color="#fff" />
+          </View>
+          <Text style={styles.drawerHeaderText}>My App</Text>
+          <Text style={styles.drawerHeaderSubText}>Welcome to the app!</Text> 
+      </View>
+      <DrawerContentScrollView {...props} contentContainerStyle={{paddingTop:10}}>
+        <DrawerItemList {...props} />
+      </DrawerContentScrollView>
+
+      <View style={styles.drawerFooter}>
+      <Ionicons name="code-slash-outline" size={24} color="#fff" />
+      <Text style={styles.drawerFooterText}>react native</Text>
+
+      </View>
+
+      </View>
+  );
+}
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tabs.Navigator
-      ScreenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'TodosScreen') {
-            iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'AlbumsScreen') {
-            iconName = focused ? 'albums' : 'albums-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
+      <StatusBar style="light" />
+      <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{
+        drawerStyle: {
+          backgroundColor: '#333',
+          width: 240,
         },
-        tabBarActiveTintColor: 'RED',
-        tabBarInactiveTintColor: 'BLUE',
-      })}
+        drawerLabelStyle: {
+          fontSize: 16,
+          fontWeight: 'bold',
+          marginLeft: -10,
+        },
+        drawerActiveTintColor: '#e91e63',
+        drawerInactiveTintColor: '#a0a0a0',
+        drawerActiveBackgroundColor: '#16213e',
+        drawerItemStyle: { 
+          borderRadius: 8,
+          marginHorizontal: 8,
+          marginVertical: 4,
+          paddingVertical: 12,
+        },
+        headerStyle: {
+          backgroundColor: '#16213e',
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        headerTintColor: '#aaa',
+        headerTitleStyle: {
+          fontSize: 20,
+          fontWeight: 'bold',
+
+        },
+
+      }}>
+
+        <Drawer.Screen name="Albums" component={AlbumsScreen} options={{title:"albums",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>
+
+        <Drawer.Screen name="Todos" component={TodosScreen}  />
+      </Drawer.Navigator>
+
       
-      >
-      <Tabs.Screen name="TodosScreen" component={TodosScreen}/>
-      <Tabs.Screen name="AlbumsScreen" component={AlbumsScreen}/>
-       
-     </Tabs.Navigator>
     </NavigationContainer>  
   );
 }
