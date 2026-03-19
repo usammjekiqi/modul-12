@@ -82,7 +82,21 @@ export default function App() {
           <Ionicons name="albums-outline" size={size} color={color} />
         )}}/>
 
-        <Drawer.Screen name="Todos" component={TodosScreen}  />
+        <Drawer.Screen name="Todos" component={TodosScreen}  options={{title:"TodosScreen",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>    
+        <Drawer.Screen name="Posts" component={PostsScreen} options={{title:"PostsScreen",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>      
+          <Drawer.Screen name="Comments" component={CommentsScreen}  options={{title:"CommentsScreen",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>     
+          <Drawer.Screen name="Photos" component={PhotosScreen}  options={{title:"PhotosScreen",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>     
+          <Drawer.Screen name="User" component={UserScreen}  options={{title:"UserScreen",  drawerIcon:({color,size}) =>(
+          <Ionicons name="albums-outline" size={size} color={color} />
+        )}}/>     
       </Drawer.Navigator>
 
       
@@ -91,30 +105,49 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  drawerHeader: {
+    backgroundColor: '#16213e',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    
   },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
+  avatarContainer: {
+    width: 80,
+    height: 50,
+    borderRadius: 40,
+    backgroundColor: '#1a2ae',
+    boarderwidth: 2,
+    borderColor: '#e91e63',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  buttonText: {
+  drawerHeaderText: {
     color: '#fff',
-    fontSize: 16,
-  },
-  screenName: {
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: 'bold',
+
   },
+  drawerHeaderSubText: {
+    color: '#aaa',
+    fontSize: 14,
+  },
+  drawerFooter: {
+    backgroundColor: '#16213e',
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection:"row",
+    
+  },
+  drawerFooterText:{
+    color:"#aaa",
+    marginLeft:5,
+    fontSize:14,
+    
+  }
 });
