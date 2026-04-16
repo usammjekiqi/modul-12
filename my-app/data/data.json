@@ -1,0 +1,52 @@
+[
+    {
+      "id": 1,
+      "name": "Wireless Headphones",
+      "category": "Electronics",
+      "image": "https://images.unsplash.com/photo-1518441902110-4a3c8e4d2c3d",
+      "description": "High-quality wireless headphones with noise cancellation.",
+      "price": 99.99
+    },
+    
+    {
+      "id": 2,
+      "name": "Running Shoes",
+      "category": "Footwear",
+      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+      "description": "Comfortable and lightweight running shoes for everyday use.",
+      "price": 79.99
+    },
+    {
+      "id": 3,
+      "name": "Smart Watch",
+      "category": "Electronics",
+      "image": "https://images.unsplash.com/photo-1517433456452-f9633a875f6f",
+      "description": "Track your fitness and stay connected with this smart watch.",
+      "price": 149.99
+    },
+    {
+      "id": 4,
+      "name": "Coffee Maker",
+      "category": "Home Appliances",
+      "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93",
+      "description": "Brew fresh and delicious coffee at home with ease.",
+      "price": 59.99
+    },
+    {
+      "id": 5,
+      "name": "Backpack",
+      "category": "Accessories",
+      "image": "https://images.unsplash.com/photo-1514474959185-1472d4c4e0a1",
+      "description": "Durable backpack with multiple compartments for daily use.",
+      "price": 39.99
+    },
+    {
+      "id": 6,
+      "name": "Gaming Keyboard",
+      "category": "Electronics",
+      "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+      "description": "Mechanical keyboard with RGB lighting for gamers.",
+      "price": 89.99
+    }
+  ]
+  
