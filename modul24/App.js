@@ -1,108 +1,186 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Dimensions, TouchableWithoutFeedback, Image} from 'react-native';
-import Bird from "./scr/bird";
-import Obstacles from "./scr/Obstacle";
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import Bird from "./src/components/bird";
+import Obstacles from "./src/components/Obstacle";
 
 export default function App() {
   const screenWidth = Dimensions.get("screen").width;
   const screenHeight = Dimensions.get("screen").height;
-  const birdLeft = screenWidth / 2;
+  const birdLeft = screenWidth * 0.28;
+
+  const gravity = 2.8;
+  const jumpSize = 58;
+  const obstacleSpeed = 4;
+  const obstacleWidth = 70;
+  const obstacleHeight = 260;
+  const gap = 220;
+  const birdSize = 40;
+
+  const randomBottomOffset = () => -Math.random() * 170;
+
   const [birdBottom, setBirdBottom] = useState(screenHeight / 2);
-  const [obstacleLeft, setObstacleLeft] = useState(screenWidth);
-  const [obstacleLeftTwo, setObstacleLeftTwo] = useState(screenWidth + screenWidth/2 +30);
-  const [obstaclesNegHeight, setObstaclesNegHeight] = useState(0);
-  const [obstaclesNegHeightTwo, setObstaclesNegHeightTwo] = useState(0);
+  const [obstacleLeft, setObstacleLeft] = useState(screenWidth + 80);
+  const [obstacleLeftTwo, setObstacleLeftTwo] = useState(screenWidth + screenWidth / 2 + 120);
+  const [obstaclesNegHeight, setObstaclesNegHeight] = useState(randomBottomOffset());
+  const [obstaclesNegHeightTwo, setObstaclesNegHeightTwo] = useState(randomBottomOffset());
   const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  const gravity = 3;
-  let obstacleWidth = 60;
-  let obstacleHeight = 300;
-  let gap = 200;
-  let gameTimerId;
-  let obstaclesTimerId;
-  let obstaclesTimerIdTwo;
 
+  const birdBottomRef = useRef(birdBottom);
+  const obstacleLeftRef = useRef(obstacleLeft);
+  const obstacleLeftTwoRef = useRef(obstacleLeftTwo);
+  const obstaclesNegHeightRef = useRef(obstaclesNegHeight);
+  const obstaclesNegHeightTwoRef = useRef(obstaclesNegHeightTwo);
 
-//Start Bird Falling
+  const gameOver = () => {
+    setIsGameOver(true);
+    setIsGameStarted(false);
+  };
 
-useEffect(() => {
-  if (birdBottom > 0) {
-    gameTimerId = setInterval(() => {
-      setBirdBottom(birdBottom => birdBottom - gravity)
-    }, 30);
-    return () => {
-      clearInterval(gameTimerId)
+  const detectCollision = (obsLeft, obsNegHeight, nextBirdBottom) => {
+    const birdHalf = birdSize / 2;
+    const birdLeftEdge = birdLeft - birdHalf;
+    const birdRightEdge = birdLeft + birdHalf;
+    const obstacleRightEdge = obsLeft + obstacleWidth;
+    const isWithinX = obstacleRightEdge > birdLeftEdge && obsLeft < birdRightEdge;
+
+    if (!isWithinX) {
+      return false;
     }
-  }
-}, [birdBottom])
 
-useEffect(() => {
-  if (obstacleLeft >  -60) {
-    obstaclesTimerId = setInterval(() => {
-      setObstacleLeft(obstacleLeft => obstacleLeft - 5)
-    }, 30);
-    return () => {
-      clearInterval(obstaclesTimerId)
+    const hitsBottomPipe = nextBirdBottom - birdHalf < obsNegHeight + obstacleHeight;
+    const hitsTopPipe = nextBirdBottom + birdHalf > obsNegHeight + obstacleHeight + gap;
+
+    return hitsBottomPipe || hitsTopPipe;
+  };
+
+  useEffect(() => {
+    if (!isGameStarted || isGameOver) {
+      return;
     }
-  } else {
-    setScore(score => score + 1);
-    setObstacleLeft(screenWidth);
-    setObstaclesNegHeight(- Math.random() * 100);
-  }
-}, [obstacleLeft])
 
-//start second obstacle
+    const gameTimerId = setInterval(() => {
+      const nextBirdBottom = birdBottomRef.current - gravity;
 
-useEffect(() => {
-  if (obstacleLeftTwo >  -60) {
-    obstaclesTimerIdTwo = setInterval(() => {
-      setObstacleLeftTwo(obstacleLeftTwo => obstacleLeftTwo - 5)
-    }, 30);
-    return () => {
-      clearInterval(obstaclesTimerIdTwo)
+      if (nextBirdBottom - birdSize / 2 <= 0) {
+        gameOver();
+        return;
+      }
+
+      if (nextBirdBottom + birdSize / 2 >= screenHeight) {
+        birdBottomRef.current = screenHeight - birdSize / 2;
+        setBirdBottom(screenHeight - birdSize / 2);
+      } else {
+        birdBottomRef.current = nextBirdBottom;
+        setBirdBottom(nextBirdBottom);
+      }
+
+      let nextObstacleLeft = obstacleLeftRef.current - obstacleSpeed;
+      let nextObstacleLeftTwo = obstacleLeftTwoRef.current - obstacleSpeed;
+
+      if (nextObstacleLeft < -obstacleWidth) {
+        nextObstacleLeft = screenWidth + 40;
+        const nextNegHeight = randomBottomOffset();
+        obstaclesNegHeightRef.current = nextNegHeight;
+        setObstaclesNegHeight(nextNegHeight);
+        setScore((currentScore) => {
+          const nextScore = currentScore + 1;
+          setBestScore((best) => Math.max(best, nextScore));
+          return nextScore;
+        });
+      }
+
+      if (nextObstacleLeftTwo < -obstacleWidth) {
+        nextObstacleLeftTwo = screenWidth + 40;
+        const nextNegHeightTwo = randomBottomOffset();
+        obstaclesNegHeightTwoRef.current = nextNegHeightTwo;
+        setObstaclesNegHeightTwo(nextNegHeightTwo);
+        setScore((currentScore) => {
+          const nextScore = currentScore + 1;
+          setBestScore((best) => Math.max(best, nextScore));
+          return nextScore;
+        });
+      }
+
+      obstacleLeftRef.current = nextObstacleLeft;
+      obstacleLeftTwoRef.current = nextObstacleLeftTwo;
+      setObstacleLeft(nextObstacleLeft);
+      setObstacleLeftTwo(nextObstacleLeftTwo);
+
+      const collidedWithFirst = detectCollision(
+        nextObstacleLeft,
+        obstaclesNegHeightRef.current,
+        birdBottomRef.current
+      );
+      const collidedWithSecond = detectCollision(
+        nextObstacleLeftTwo,
+        obstaclesNegHeightTwoRef.current,
+        birdBottomRef.current
+      );
+
+      if (collidedWithFirst || collidedWithSecond) {
+        gameOver();
+      }
+    }, 24);
+
+    return () => clearInterval(gameTimerId);
+  }, [isGameStarted, isGameOver, screenHeight, screenWidth]);
+
+  const jump = () => {
+    if (isGameOver) {
+      return;
     }
-  } else {
-    setScore(score => score + 1);
-    setObstacleLeftTwo(screenWidth);
-    setObstaclesNegHeightTwo(- Math.random() * 100);
-  }
-}, [obstacleLeftTwo])
 
-//jump behavior
+    if (!isGameStarted) {
+      setIsGameStarted(true);
+    }
 
-// jump behavior
+    const nextBirdBottom = Math.min(screenHeight - birdSize / 2, birdBottomRef.current + jumpSize);
+    birdBottomRef.current = nextBirdBottom;
+    setBirdBottom(nextBirdBottom);
+  };
 
-const jump = () => {
-  if (!isGameOver && birdBottom < screenHeight) {
-    setBirdBottom(prevBirdBottom => prevBirdBottom + 50);
-    console.log("jumped");
-  }
-};
+  const resetGame = () => {
+    const resetBirdBottom = screenHeight / 2;
+    const resetObstacleOne = screenWidth + 80;
+    const resetObstacleTwo = screenWidth + screenWidth / 2 + 120;
+    const resetNegHeightOne = randomBottomOffset();
+    const resetNegHeightTwo = randomBottomOffset();
 
-useEffect(() => {
-  if (
-    (birdBottom < (obstaclesNegHeight + obstacleHeight + 30) ||
-      birdBottom > (obstaclesNegHeight + obstacleHeight + gap - 30)) &&
-    (obstacleLeft > screenWidth / 2 - 30 && obstacleLeft < screenWidth / 2 + 30)
-  ) {
-    console.log("game over");
-    gameOver();
-  }
-}, [birdBottom, obstaclesNegHeight, obstacleHeight, gap, obstacleLeft, screenWidth, gameOver, isGameOver]);
-}
+    birdBottomRef.current = resetBirdBottom;
+    obstacleLeftRef.current = resetObstacleOne;
+    obstacleLeftTwoRef.current = resetObstacleTwo;
+    obstaclesNegHeightRef.current = resetNegHeightOne;
+    obstaclesNegHeightTwoRef.current = resetNegHeightTwo;
 
-const gameOver = () => {
-  clearInterval(gameTimerId);
-  clearInterval(obstaclesTimerId);
-  clearInterval(obstaclesTimerIdTwo);
-}
+    setBirdBottom(resetBirdBottom);
+    setObstacleLeft(resetObstacleOne);
+    setObstacleLeftTwo(resetObstacleTwo);
+    setObstaclesNegHeight(resetNegHeightOne);
+    setObstaclesNegHeightTwo(resetNegHeightTwo);
+    setScore(0);
+    setIsGameOver(false);
+    setIsGameStarted(false);
+  };
 
   return (
-    
     <TouchableWithoutFeedback onPress={jump}>
       <View style={styles.container}>
-        <Image source={require("/../../assets/background.png")} style={styles.backgroundImage} resizeMode="cover" />
-        <Text style={styles.score}>Score: {score}</Text>
+        <Image source={require("./assets/background.png")} style={styles.backgroundImage} resizeMode="cover" />
+        <View style={styles.hud}>
+          <Text style={styles.score}>Score: {score}</Text>
+          <Text style={styles.bestScore}>Best: {bestScore}</Text>
+        </View>
         <Bird birdBottom={birdBottom} birdLeft={birdLeft}/>
         <Obstacles color={"green"} 
         obstacleWidth={obstacleWidth} 
@@ -116,27 +194,64 @@ const gameOver = () => {
         randomButton={obstaclesNegHeightTwo}
         gap={gap} obstacleLeft={obstacleLeftTwo}
         />
+
+        {!isGameStarted && !isGameOver && (
+          <View style={styles.overlay}>
+            <Text style={styles.overlayTitle}>Flappy Bird</Text>
+            <Text style={styles.overlayText}>Tap anywhere to start</Text>
+          </View>
+        )}
+
+        {isGameOver && (
+          <View style={styles.overlay}>
+            <Text style={styles.overlayTitle}>Game Over</Text>
+            <Text style={styles.overlayText}>Score: {score}</Text>
+            <TouchableOpacity style={styles.playAgainButton} onPress={resetGame}>
+              <Text style={styles.playAgainText}>Play Again</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
 
 
   );
 
-
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  score: {
-    fontSize: 32,
-    top: 50,
+  hud: {
+    width: "100%",
+    paddingHorizontal: 20,
+    paddingTop: 48,
     position: "absolute",
-    zIndex: 1,
+    top: 0,
+    left: 0,
+    zIndex: 3,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  score: {
+    fontSize: 30,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    color: "#fff",
+    textShadowColor: "rgba(0, 0, 0, 0.45)",
+    textShadowOffset: { width: 1, height: 2 },
+    textShadowRadius: 3,
+  },
+  bestScore: {
+    fontSize: 24,
+    fontWeight: "700",
     color: "white",
+    textShadowColor: "rgba(0, 0, 0, 0.45)",
+    textShadowOffset: { width: 1, height: 2 },
+    textShadowRadius: 3,
   },
   backgroundImage: {
     position: "absolute",
@@ -144,5 +259,39 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
-  }
+  },
+  overlay: {
+    position: "absolute",
+    zIndex: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(16, 24, 40, 0.58)",
+    borderRadius: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 28,
+    minWidth: 260,
+  },
+  overlayTitle: {
+    color: "#fff",
+    fontSize: 34,
+    fontWeight: "900",
+    marginBottom: 8,
+  },
+  overlayText: {
+    color: "#e6f4ff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  playAgainButton: {
+    marginTop: 16,
+    backgroundColor: "#ffb703",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 999,
+  },
+  playAgainText: {
+    color: "#1d1d1f",
+    fontSize: 18,
+    fontWeight: "800",
+  },
 });

@@ -1,47 +1,41 @@
 import React from "react";
-import { View ,     Image} from "react-native";
+import { Image } from "react-native";
 
-const Obstacle = ({
-    color,
-    obstacleLeft,
-    obstacleWidth,
-    obstacleHeight,
-    gap,
+const Obstacles = ({
+    color, 
+    obstacleWidth, 
+    obstacleHeight, 
+    randomButton,
+    gap, 
     obstacleLeft}) => {
     return (
         <>
-            <Image style ={{
-                position: "absolute",
-                backgroundColor: color,
-                left: obstacleLeft,
-                width: obstacleWidth,
-                height: obstacleHeight,
-            }} 
-            source={require("../../assets/obstacle.png")}
-            resizeMode="stretch" 
-            />
-            
-        <Image
-            style ={{
+            <Image style={{
                 position: "absolute",
                 zIndex: 0,
-                backgroundColor: color,
                 width: obstacleWidth,
-                height: obstacleHeight ,
+                height: 500,
                 left: obstacleLeft,
-                bottom: randomBotton,
-            }} 
-            source={require("../../assets/obstacle.png")}
-            resizeMode="cover"
-        
-        
+                bottom: randomButton + obstacleHeight + gap
+        }}
+        source={require("../../assets/pipe.png")}
+        resizeMode="cover"
         />
+        <Image style={{
+            position: "absolute",
+            zIndex: 0,
+            backgroundColor: color,
+            width: obstacleWidth,
+            height: obstacleHeight,
+            left: obstacleLeft,
+            bottom: randomButton,
+        }}
+        source={require("../../assets/pipe.png")}
+        resizeMode="cover"
 
-       </>
-
-  
+        />
+        </>
     );
-
 }
 
-export default Obstacle;
+export default Obstacles;
